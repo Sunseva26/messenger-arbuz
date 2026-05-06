@@ -1,0 +1,41 @@
+name: Сборка APK Арбуз
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Установка Java
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+      
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.19.6'
+          channel: 'stable'
+      
+      - name: Установка зависимостей
+        run: |
+          flutter pub get
+      
+      - name: Генерация иконок
+        run: |
+          flutter pub run flutter_launcher_icons
+      
+      - name: Сборка APK
+        run: |
+          flutter build apk --release
+      
+      - name: Загрузка APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: Arbuz-Messenger-APK
+          path: build/app/outputs/flutter-apk/app-release.apk
